@@ -25,7 +25,7 @@ class Main {
             ]
 
             GD.S_SERVICE_READY.add(name=>{
-                console.log("Service: "+name+" ready")
+                console.log("Service "+name+" is ready")
                 i++;
                 if(i === services.length){
                     resolve();

@@ -3,12 +3,14 @@ import BaseService from "./BaseService";
 
 export interface ConfigVO{
     HTTP_SERVICE_PORT:number
+    HTTP_PUBLIC_DIR:string
 }
 
 class Config extends BaseService{
     
     data:ConfigVO={
-        HTTP_SERVICE_PORT:8080
+        HTTP_SERVICE_PORT:8080,
+        HTTP_PUBLIC_DIR:"public"
     }
 
     constructor(){

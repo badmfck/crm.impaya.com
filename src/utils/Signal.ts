@@ -149,7 +149,6 @@ export class SyncSignal<T,K> {
     */
    
     set listener(_listener:(request:T,response:(data:K)=>void)=>void){
-        console.log("add worker")
         this.worker=_listener;
     }
     

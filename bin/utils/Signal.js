@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SyncSignal = exports.SignalHandler = void 0;
 class Signal {
-    constructor(name) {
-        this.busy = false;
-        this.tempAdd = [];
-        this.tempRem = [];
-        this.tempInvoke = [];
-        this.callbacks = [];
-    }
+    static nextID = 0;
+    busy = false;
+    tempAdd = [];
+    tempRem = [];
+    tempInvoke = [];
+    callbacks = [];
+    constructor(name) { }
     add(callback, id) {
         if (!id)
             id = "" + (Signal.nextID++);
@@ -86,10 +86,11 @@ class Signal {
         }
     }
 }
-Signal.nextID = 0;
 class SignalHandler {
+    static nextID = 0;
+    id;
+    signals = [];
     constructor() {
-        this.signals = [];
         this.id = SignalHandler.nextID++;
     }
     add(signal, cb) {
@@ -111,8 +112,8 @@ class SignalHandler {
     }
 }
 exports.SignalHandler = SignalHandler;
-SignalHandler.nextID = 0;
 class SyncSignal {
+    worker;
     request(data) {
         const executor = (resolve, reject) => {
             if (!this.worker) {
@@ -131,7 +132,6 @@ class SyncSignal {
     }
     */
     set listener(_listener) {
-        console.log("add worker");
         this.worker = _listener;
     }
 }

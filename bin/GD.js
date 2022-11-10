@@ -26,8 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GD = void 0;
 const Signal_1 = __importStar(require("./utils/Signal"));
 class GD {
+    static S_SERVICE_READY = new Signal_1.default();
+    static S_APP_READY = new Signal_1.default();
+    static S_CONFIG_REQUEST = new Signal_1.SyncSignal();
 }
 exports.GD = GD;
-GD.S_SERVICE_READY = new Signal_1.default();
-GD.S_APP_READY = new Signal_1.default();
-GD.S_CONFIG_REQUEST = new Signal_1.SyncSignal();
