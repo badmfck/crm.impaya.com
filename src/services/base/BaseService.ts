@@ -1,4 +1,4 @@
-import { GD } from "../GD";
+import { GD } from "../../GD";
 import IService from "./IService";
 
 class BaseService implements IService{

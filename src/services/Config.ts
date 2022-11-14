@@ -1,16 +1,18 @@
 import { GD } from "../GD";
-import BaseService from "./BaseService";
+import BaseService from "./base/BaseService";
 
 export interface ConfigVO{
     HTTP_SERVICE_PORT:number
     HTTP_PUBLIC_DIR:string
+    HTTP_TIMEOUT:number
 }
 
 class Config extends BaseService{
     
     data:ConfigVO={
         HTTP_SERVICE_PORT:8080,
-        HTTP_PUBLIC_DIR:"public"
+        HTTP_PUBLIC_DIR:"public",
+        HTTP_TIMEOUT:1000*30
     }
 
     constructor(){
