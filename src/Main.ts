@@ -3,6 +3,10 @@ import IService from "./services/base/BaseService";
 import { GD } from "./GD";
 import Config from "./services/Config";
 import Helper from "./Helper";
+import MySQL from "./services/Mysql";
+import Packer from "./utils/Packer";
+import EventService from "./services/EventService";
+
 
 
 class Main {
@@ -16,21 +20,28 @@ class Main {
         GD.S_APP_READY.invoke();
         console.log("APP LAUNCHED")
 
-        const a= JSON.stringify({
+        /*const a= JSON.stringify({
             method:"trx.add",
             data:{
                 login:"text",
                 passwd:"123",
                 key:"привет медвед"
             }
+        })*/
+        const a = JSON.stringify({
+            secret:"aW1wYXlhX3NlcnZlcl90b2tlbg",
+            ts:+new Date()
         })
 
-        const packed=Helper.pack("testing_key",a)
+        const packed=Helper.pack("iNt3rna1_k3Y",a)
         console.log(packed,packed.length)
-        console.log(Helper.unpack("testing_key",packed));
+        console.log(Helper.unpack("iNt3rna1_k3Y",packed));
 
         console.log(">> ",Buffer.from(a).toString("base64"));
         console.log(a,a.length);
+
+        console.log(new Packer().generateUID());
+        console.log("pass:",new Packer().passhash("3141592zdec"));
         
         
     }
@@ -40,7 +51,9 @@ class Main {
             let i=0;
             let services:(typeof IService)[]=[
                 Config,
-                HTTPServer
+                HTTPServer,
+                MySQL,
+                EventService
             ]
 
             GD.S_SERVICE_READY.add(name=>{

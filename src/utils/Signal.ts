@@ -132,7 +132,7 @@ export class SyncSignal<T,K> {
     request(data:T):Promise<K>{
         const executor=(resolve:(value:K)=>void,reject:(reason?:any)=>void)=>{
             if(!this.worker){
-                reject("No worker registered")
+                reject("No worker registered in SyncSignal")
                 return;
             }
             this.worker(data,resolve);

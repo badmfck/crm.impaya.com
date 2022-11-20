@@ -8,11 +8,15 @@ import Bridge from "./api/Transactions";
 import IAPIHandler from "./base/IAPIHandler";
 import Helper from "../Helper";
 import Transactions from "./api/Transactions";
+import Clients from "./api/Clients";
 
 
 
 interface HandlersVO{
     [key:string]:IAPIHandler
+    auth:Auth,
+    trx:Transactions,
+    clients:Clients
 }
 class HTTPServer extends BaseService{
 
@@ -20,7 +24,8 @@ class HTTPServer extends BaseService{
 
     private handlers:HandlersVO = {
         auth:new Auth(),
-        trx:new Transactions()
+        trx:new Transactions(),
+        clients:new Clients()
     }
 
     constructor(){
@@ -52,7 +57,6 @@ class HTTPServer extends BaseService{
             
             if(req.method === "POST"){
                 const b =  req.body
-                console.log(typeof b)
                 this.handleRequest(req,res,b)
                 return;
             }
@@ -102,11 +106,20 @@ class HTTPServer extends BaseService{
             return;
         }
 
+        const ip = req.socket.remoteAddress;
+        if(!ip){
+            return this.sendResponse(res,{
+                error:Errors.NO_IP,
+                data:null
+            },tme)
+        }
+
+        
         // route throught hadlres, sends response
-        this.route(res,req.method.toLowerCase(),packet,tme)
+        this.route(res,req.method.toLowerCase(),ip,packet,tme)
     }
 
-    async route(res:Response,httpMethod:string,packet:TransferPacketVO,tme:number){
+    async route(res:Response,httpMethod:string,ip:string,packet:TransferPacketVO,tme:number){
         const request = packet.data as SimpleObjectVO;
 
             if(!("method" in request) || typeof request.method !== "string"){
@@ -128,6 +141,30 @@ class HTTPServer extends BaseService{
             }
             const module = this.handlers[moduleName];
 
+
+            // check auth
+            let authorizedUser:UserVO|null = null;
+            if(packet.data.key){
+                try{
+                    authorizedUser = await this.handlers.auth.checkAuthKey(packet.data.key)
+                }catch(e){
+                    this.sendResponse(res,{
+                        error:Errors.RUNTIME_ERROR,
+                        data:`${e}`
+                    },tme)
+                    return;
+                }
+            }
+
+
+            if(!authorizedUser && (module !== this.handlers.auth)){
+                this.sendResponse(res,{
+                    error:Errors.UNAUTHORIZED_ACCESS,
+                    data:null
+                },tme)
+                return;
+            }
+
             let response;
             
             try{
@@ -135,7 +172,9 @@ class HTTPServer extends BaseService{
                     httpMethod:httpMethod,
                     encrypted:packet.encrypted ?? false,
                     method:method,
-                    data:request.data
+                    data:request.data,
+                    ip:ip,
+                    user:authorizedUser
                })
             }catch(e){
                 this.sendResponse(res,{

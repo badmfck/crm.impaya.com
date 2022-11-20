@@ -20,6 +20,7 @@ class Packer {
 
     private te:TextEncoder;
     private td:TextDecoder;
+    private epoch:number=1668639144200;
     constructor(){
         this.te=new TextEncoder();
         this.td=new TextDecoder();
@@ -144,6 +145,15 @@ class Packer {
         keyHash+=crypto.createHash("sha256").update(keyHash).digest("base64");
         keyHash = keyHash.substring(0,Packer.baseMatrix.length*Packer.baseMatrix[0].length)
         return this.te.encode(keyHash);
+    }
+
+    generateUID():string{
+        const id= Math.abs(+new Date() - this.epoch);
+        return this.pack("internal",id.toString(16)).replaceAll("=","")
+    }
+
+    passhash(passwd:string){
+        return crypto.createHash("sha256").update(passwd).digest("base64").replaceAll("=","");
     }
 
 }

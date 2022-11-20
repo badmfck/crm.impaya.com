@@ -11,5 +11,23 @@ class Errors{
    static RUNTIME_ERROR:ErrorVO={code:9,message:"runtime error"}
    static EMPTY_RESPONSE:ErrorVO={code:9,message:"empty response"}
    static WRONG_HTTP_METHOD:ErrorVO={code:9,message:"wrong http method"}
+   static WRONG_BRANCH:ErrorVO={code:10,message:"wrong branch"}
+   static WRONG_TOKEN:ErrorVO={code:11,message:"wrong token"}
+   static NO_TOKEN:ErrorVO={code:12,message:"no token"}
+   static NO_FIELDS:ErrorVO={code:13,message:"no fields"}
+   static NO_IP:ErrorVO={code:14,message:"no ip"}
+   static UNAUTHORIZED_ACCESS:ErrorVO={code:15,message:"unauthorized access"}
+
+   // AUTH 50
+   static AUTH_CHECK_LOGIN_OR_PASSWD:ErrorVO={code:50,message:"check login or password fields"}
+   static AUTH_WRONG_SYMBOLS_IN_LOGIN:ErrorVO={code:51,message:"wrong symbols in login"}
+   static AUTH_USER_NOT_ADDED:ErrorVO={code:52,message:"user not added"}
+   static AUTH_WRONG_LOGIN_OR_PASSWD:ErrorVO={code:53,message:"wrong login or password"}
+   static AUTH_USER_LOCKED:ErrorVO={code:54,message:"wrong login or password"}
+   static AUTH_DAMAGED_USER:ErrorVO={code:55,message:"damaged user"}
+   static AUTH_USER_NOT_AUTHENTICATED:ErrorVO={code:56,message:"user not authenticated"}
+
+   // TRX
+   static TRX_WRONG_BRANCH:ErrorVO={code:100,message:"wrong branch"}
 }
 export default Errors;
