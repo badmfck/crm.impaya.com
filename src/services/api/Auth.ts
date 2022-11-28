@@ -13,6 +13,7 @@ class Auth extends BaseHandler{
         super("Auth")
     }
 
+
     async init(){}
     async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
 
@@ -28,6 +29,10 @@ class Auth extends BaseHandler{
             return this.login(packet);
             case "addUser":
             return this.addUser(packet);
+            case "getIP":
+            return this.getIP(packet);
+            case "check":
+            return this.check(packet);
         }
     
 
@@ -35,7 +40,30 @@ class Auth extends BaseHandler{
        
     }
 
-    //LTboi0yOENy/iu3fA6Z0l19VF06Twq6EVIyVgwMy7ps
+    async check(packet:ExecutionParamsVO):Promise<TransferPacketVO>{
+        if(!packet.user){
+            return {
+                error:Errors.UNAUTHORIZED_ACCESS,
+                data:null
+            }
+        }
+        return {
+            error: null,
+            data:true
+        }
+    }
+
+    async getIP(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+
+        return {
+            error:null,
+            data:{
+                ip:packet.ip,
+                method:packet.httpMethod,
+                headers:packet.headers
+            }
+        }
+    }
 
     async addUser(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
 
@@ -91,6 +119,14 @@ class Auth extends BaseHandler{
         })
 
         if(!res.data || !Array.isArray(res.data) || res.data.length!==1){
+
+            if(res.err){
+                return {
+                    error:Errors.DB_ERR,
+                    data:res.err
+                }
+            }
+
             return {
                 error:Errors.AUTH_WRONG_LOGIN_OR_PASSWD,
                 data:res.err ? res.err:null
@@ -138,8 +174,9 @@ class Auth extends BaseHandler{
         }
 
         //create key
-        const key = Helper.passhash(Helper.pack("internal_key",packet.ip+'_'+user.uid+"_"+(+new Date())+"_"+Math.random()*1000000));
-       
+        let key = Helper.passhash(Helper.pack("internal_key",packet.ip+'_'+user.uid+"_"+(+new Date())+"_"+Math.random()*1000000));
+        if(key.length>64)
+            key = key.substring(0,64);
         
        
         const resp =await GD.S_REQ_MYSQL_INSERT_QUERY.request({
@@ -213,7 +250,7 @@ class Auth extends BaseHandler{
         })
 
         if(resp.err){
-            console.error("Wrong auth key: "+key)
+            console.error("Wrong auth key: "+key,resp.err)
             return null;
         }
 

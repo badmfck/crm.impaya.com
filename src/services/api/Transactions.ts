@@ -5,18 +5,46 @@ import Errors from "../../structures/Error";
 import BaseHandler from "./BaseHandler";
 
 class Transactions extends BaseHandler{
+    config:ConfigVO|null = null;
+
     constructor(){
         super("Transaxtions (trx)")
     }
-    async init (){}
+
+    async init (){
+        this.config = await GD.S_CONFIG_REQUEST.request();
+    }
 
     async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
 
         switch(packet.method){
             case "add":
             return this.add(packet);
+            case "request":
+            return this.request(packet);
         }
         return super.execute(packet);
+    }
+
+    async request(packet:ExecutionParamsVO):Promise<TransferPacketVO>{
+
+        // TODO: CHECK ROLES
+
+        const mysql = await GD.S_REQ_MYSQL_SELECT.request({
+            query:"SELECT * FROM trx_11 LIMIT 100",
+            fields:{}
+        })
+
+        if(mysql.err){
+            return {
+                error:Errors.DB_ERR,
+                data:null
+            }
+        }
+
+
+
+        return {error:null,data:mysql.data}
     }
 
 
@@ -24,6 +52,13 @@ class Transactions extends BaseHandler{
         if(packet.httpMethod!=="post"){
             return {
                 error:Errors.WRONG_HTTP_METHOD,
+                data:null
+            }
+        }
+
+        if(!packet.user || packet.user.uid !== this.config?.IMPAYA_SERVER_USER_UID){
+            return {
+                error:Errors.WRONG_SERVER_USER,
                 data:null
             }
         }
@@ -36,26 +71,48 @@ class Transactions extends BaseHandler{
             }
         }
 
-        /*const token =JSON.parse(Helper.unpack("iNt3rna1_k3Y",request.token) ?? "");
-        if(!token || token.secret !== "aW1wYXlhX3NlcnZlcl90b2tlbg"){
+        if(!trx.transaction || !trx.transaction.status_id){
             return {
-                error:Errors.WRONG_BRANCH,
+                error:Errors.TRX_NO_TRANSACTION_STATUS,
                 data:null
             }
-        }*/
+        }
+        
+        const fields =[
+            {
+                name:"ctime",
+                value:"!@FROM_UNIXTIME("+(trx.timestamp ?? 0)+")"
+            },
+            {
+                name:"data",
+                value:trx.branch+", "+packet.user?.login+"@"+packet.ip+", trx."+packet.method
+            }
+        ]
 
-        //TODO: check timestamp, if incorrect - WRONG_TOKEN
-
-        // PROTECT OVER INJECTION
-        const trxdata = (typeof trx.transaction ==="string") ? trx.transaction : JSON.stringify(trx.transaction)
+        for(let i in trx.transaction){
+            if(i === "ut_created" || i === "ut_updated"){
+                fields.push({
+                    name:i,
+                    value:"!@FROM_UNIXTIME("+(trx.transaction as any)[i]+")"
+                })
+            }else{
+                fields.push({
+                    name:i,
+                    value:(trx.transaction as any)[i]
+                })
+            }
+        }
+        
+        //TODO: TABLE PREFIX MUST BE AS TRANSACTION UPDATE TIME!!!
 
         const result = await GD.S_REQ_MYSQL_INSERT_QUERY.request(
             {
                 table:"trx_"+Helper.dateFormatter.format(new Date(),"%m"),
-                fields:[
+                fields:fields,
+                onUpdate:[
                     {
-                        name:"data",
-                        value:trxdata
+                        name:"status_id",
+                        value:trx.transaction.status_id  
                     }
                 ]
             }

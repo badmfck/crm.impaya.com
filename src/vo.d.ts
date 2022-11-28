@@ -1,7 +1,24 @@
+
 //import e from "express"
 declare interface SimpleObjectVO{
     [key:string]:string|number|boolean|SimpleObjectVO|Array<SimpleObjectVO>|Array<string>|Array<number>|null|undefined
 }
+
+
+declare interface ConfigVO{
+    HTTP_SERVICE_PORT:number
+    HTTP_PUBLIC_DIR:string
+    HTTP_TIMEOUT:number
+
+    SQL_HOST:string
+    SQL_PORT?:number
+    SQL_USER:string
+    SQL_PASSWD:string
+    SQL_MAX_CONNECTIONS:number
+
+    IMPAYA_SERVER_USER_UID:string
+}
+
 declare interface TransferPacketVO{
     error:ErrorVO|null,
     data:any
@@ -13,6 +30,7 @@ declare interface ExecutionParamsVO{
     encrypted:boolean,
     method:string,
     httpMethod:string,
+    headers:SimpleObjectVO,
     ip:stirng,
     user:UserVO|null,
     data:string|boolean|number|Array<string>|Array<number>|Array<boolean>|Array<SimpleObjectVO>|SimpleObjectVO|null|undefined
@@ -29,7 +47,8 @@ declare interface MySQLQueryVO{
 }
 declare interface MySQLInsertQueryVO{
     table:string,
-    fields:{name:string,value:string|null}[],
+    fields:{name:string,value:string|null|boolean|number}[],
+    onUpdate?:{name:string,value:string|null|boolean|number}[]
 }
 
 declare interface MySQLResult{
@@ -67,10 +86,24 @@ declare interface UserVO{
 
 
 //API REQ
+declare interface TransactionVO{
+    transaction_id: number
+    ref_transaction_id: number, 
+    status_id:number,
+    ut_created:number, 
+    ut_updated:number,
+    merchant_id:number, 
+    amount:number,
+    currency:string,
+    rate:string,
+    description:string,
+    hash:string
+}
+
 declare interface TRXAddPacketVO{
     branch?:string,
     timestamp?:number,
-    transaction:string|boolean|number|Array<string>|Array<number>|Array<boolean>|Array<SimpleObjectVO>|SimpleObjectVO|null|undefined;
+    transaction:TransactionVO
 }
 declare interface AuthAddUserPacketVO{
     login?:string,

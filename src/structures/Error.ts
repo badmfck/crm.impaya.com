@@ -17,6 +17,7 @@ class Errors{
    static NO_FIELDS:ErrorVO={code:13,message:"no fields"}
    static NO_IP:ErrorVO={code:14,message:"no ip"}
    static UNAUTHORIZED_ACCESS:ErrorVO={code:15,message:"unauthorized access"}
+   static DB_ERR:ErrorVO={code:16,message:"Data exchange error"}
 
    // AUTH 50
    static AUTH_CHECK_LOGIN_OR_PASSWD:ErrorVO={code:50,message:"check login or password fields"}
@@ -29,5 +30,8 @@ class Errors{
 
    // TRX
    static TRX_WRONG_BRANCH:ErrorVO={code:100,message:"wrong branch"}
+   static TRX_NO_TRANSACTION_ID:ErrorVO={code:101,message:"no transaction_id"}
+   static TRX_NO_TRANSACTION_STATUS:ErrorVO={code:102,message:"no status_id"}
+   static WRONG_SERVER_USER:ErrorVO={code:103,message:"wrong server user"}
 }
 export default Errors;

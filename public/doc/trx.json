@@ -1,0 +1,25 @@
+
+{
+  "head":"TRX MODULE",
+  "descriptopn":"Registrate transaction in CRM",
+  "request":[
+    {"host" : "https://crm.impaya.com/api"},
+    {"method" : "POST"},
+    {"content_type":"application/json"}
+  ],
+  "variables":[
+    {"name":"method","description":"Method name","value":"trx.add","type":"String"},
+    {"name":"key","description":"Authentication key","value":"[key]","type":"String"},
+    {"name":"data","description":"Data object","value":[
+      {"name":"branch","description":"Branch name","value":"[valid branch name]","type":"String"},
+      {"name":"timestamp","description":"Time when transaction has been sent to crm,","value":"[unix timestamp]","type":"Int"},
+      {"name":"transaction","description":"Transaction object","value":"[trx.object]","type":"Object"}
+    ],"type":"Object"}
+  ],
+  "answers":[
+    
+  ],
+  "exmaple":[
+    {"language":"pseudo","value":"ewogICAgIm1ldGhvZCI6ICJ0cnguYWRkIiwKICAgICJrZXkiOiJMVGJvaTB5T0VOeS9pdTNmQTZaMGwxOVZGMDZUd3E2RVZJeVZnd015IiwKICAgICJkYXRhIjogewogICAgICAiYnJhbmNoIjogImltcGF5YSIsCiAgICAgICJ0aW1lc3RhbXAiOjExMjMxMjMsCiAgICAgICJ0cmFuc2FjdGlvbiI6eyJkYXRhIjoic29tZSJ9CiAgICB9Cn0="}
+  ]
+}

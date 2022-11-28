@@ -1,4 +1,3 @@
-import { ConfigVO } from "./services/Config";
 import Signal, { SyncSignal } from "./utils/Signal";
 
 export class GD{

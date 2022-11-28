@@ -1,7 +1,6 @@
 import BaseService from "./base/BaseService";
 import express, { Response,Request } from "express";
 import { GD } from "../GD";
-import { ConfigVO } from "./Config";
 import Errors from "../structures/Error";
 import Auth from "./api/Auth";
 import Bridge from "./api/Transactions";
@@ -9,6 +8,8 @@ import IAPIHandler from "./base/IAPIHandler";
 import Helper from "../Helper";
 import Transactions from "./api/Transactions";
 import Clients from "./api/Clients";
+import { IncomingHttpHeaders } from "http";
+import cors from "cors"
 
 
 
@@ -42,13 +43,33 @@ class HTTPServer extends BaseService{
 
 
         this.cfg = await GD.S_CONFIG_REQUEST.request();
+        if(!this.cfg){
+            console.error("Error, no config!")
+            return;
+        }
         const app = express();
+
+        
         
         //attach public dir
         app.use(express.static(this.cfg.HTTP_PUBLIC_DIR))
-
         app.use(express.json()) // for parsing application/json
         app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+       
+        const whitelist = [
+            'http://localhost:3000',
+            "https://crm.impaya.com"
+        ];
+        const corsOptions = {
+            origin: (origin:any, callback:any)=>{
+                console.log(origin)
+                const originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+                callback(null, originIsWhitelisted);
+            },
+            credentials: true
+        };
+        app.use(cors(corsOptions))
+
 
         // listen all on /
         app.all("/api/",async (req,res)=>{
@@ -106,7 +127,13 @@ class HTTPServer extends BaseService{
             return;
         }
 
-        const ip = req.socket.remoteAddress;
+        let ip = req.socket.remoteAddress;
+
+        if("x-real-ip" in req.header){
+            const tmp =(req.header as any)['x-real-ip'];
+            if(tmp)
+                ip=tmp
+        }
         if(!ip){
             return this.sendResponse(res,{
                 error:Errors.NO_IP,
@@ -116,10 +143,10 @@ class HTTPServer extends BaseService{
 
         
         // route throught hadlres, sends response
-        this.route(res,req.method.toLowerCase(),ip,packet,tme)
+        this.route(res,req.method.toLowerCase(),ip,packet,req.headers,tme)
     }
 
-    async route(res:Response,httpMethod:string,ip:string,packet:TransferPacketVO,tme:number){
+    async route(res:Response,httpMethod:string,ip:string,packet:TransferPacketVO,headers:IncomingHttpHeaders,tme:number){
         const request = packet.data as SimpleObjectVO;
 
             if(!("method" in request) || typeof request.method !== "string"){
@@ -130,15 +157,16 @@ class HTTPServer extends BaseService{
             }
             
             const tmp = request.method.split(".")
-            const moduleName=tmp[0]?.replaceAll(/[^0-9a-zA-Z_]/gi,"")
+            let moduleName=tmp[0]?.replaceAll(/[^0-9a-zA-Z_]/gi,"")
             const method=tmp[1]?.replaceAll(/[^0-9a-zA-Z_]/gi,"");
-            if(!moduleName || moduleName.length === 0 || !(moduleName in this.handlers)){
+            if(!moduleName || moduleName.length === 0 || !(moduleName in this.handlers)){   
                 this.sendResponse(res, {
                     error:Errors.WRONG_METHOD,
                     data:null
                 },tme)
                 return;
             }
+            moduleName=moduleName.toLowerCase();
             const module = this.handlers[moduleName];
 
 
@@ -174,7 +202,8 @@ class HTTPServer extends BaseService{
                     method:method,
                     data:request.data,
                     ip:ip,
-                    user:authorizedUser
+                    user:authorizedUser,
+                    headers:headers
                })
             }catch(e){
                 this.sendResponse(res,{
@@ -263,6 +292,7 @@ class HTTPServer extends BaseService{
             return;
         }
         try{
+            
             res.send(data);
         }catch(e){
             console.error("Can't send response! ",e)

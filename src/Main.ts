@@ -7,6 +7,7 @@ import MySQL from "./services/Mysql";
 import Packer from "./utils/Packer";
 import EventService from "./services/EventService";
 
+import fs from "fs"
 
 
 class Main {
@@ -15,35 +16,22 @@ class Main {
 
     private async init(){
         await this.initializeServices();
-
-        
         GD.S_APP_READY.invoke();
         console.log("APP LAUNCHED")
 
-        /*const a= JSON.stringify({
-            method:"trx.add",
-            data:{
-                login:"text",
-                passwd:"123",
-                key:"привет медвед"
-            }
-        })*/
-        const a = JSON.stringify({
-            secret:"aW1wYXlhX3NlcnZlcl90b2tlbg",
-            ts:+new Date()
-        })
 
-        const packed=Helper.pack("iNt3rna1_k3Y",a)
-        console.log(packed,packed.length)
-        console.log(Helper.unpack("iNt3rna1_k3Y",packed));
-
-        console.log(">> ",Buffer.from(a).toString("base64"));
-        console.log(a,a.length);
-
-        console.log(new Packer().generateUID());
-        console.log("pass:",new Packer().passhash("3141592zdec"));
-        
-        
+    
+        let rawdata = fs.readFileSync('data/merchants.json');
+        let data = JSON.parse(rawdata.toString("utf-8"));
+        let q= "INSERT INTO `merchants` (`id`,`name`,`client_id`) VALUES";
+        let z = 0;
+        for(let i of data){
+            if(z>0)
+            q+=", ";
+            q+=' ("'+i.id+'","'+i.name.replaceAll('"','\\"')+'","'+i.client_id+'") '
+            z++;
+        }
+        fs.writeFileSync("data/client_q.txt",q)
     }
 
     private async initializeServices():Promise<void>{

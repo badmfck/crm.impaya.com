@@ -1,17 +1,7 @@
 import { GD } from "../GD";
 import BaseService from "./base/BaseService";
 
-export interface ConfigVO{
-    HTTP_SERVICE_PORT:number
-    HTTP_PUBLIC_DIR:string
-    HTTP_TIMEOUT:number
 
-    SQL_HOST:string
-    SQL_PORT?:number
-    SQL_USER:string
-    SQL_PASSWD:string
-    SQL_MAX_CONNECTIONS:number
-}
 
 class Config extends BaseService{
     /*
@@ -25,7 +15,9 @@ class Config extends BaseService{
         SQL_PORT:3306,
         SQL_USER:"crm",
         SQL_PASSWD:"{crm_iMpaya71)",
-        SQL_MAX_CONNECTIONS:10
+        SQL_MAX_CONNECTIONS:10,
+
+        IMPAYA_SERVER_USER_UID:"NBcaU1GMlI5vUWw"
     }
 
     constructor(){

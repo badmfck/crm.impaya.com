@@ -27,6 +27,8 @@ class MySQL extends BaseService{
         this.onServiceReady();
     }
 
+    
+
     executeSelectQuery(request:MySQLSelectQueryVO,response:(data:MySQLResult)=>void){
         let q= request.query;
         for(let i in request.fields){
@@ -115,13 +117,43 @@ class MySQL extends BaseService{
 
         let rawQuery="";
         for(let query of q){
-            const names=query.fields.map(val=>"`"+val.name+"`").join(",");
-            const values = query.fields.map(
-                val=>val.value?("\""+val.value.replaceAll('"','\\"')+"\""):null
-            ).join(",")
+
+            const names=query.fields.map(val=>{
+                let name =val.name;
+                name=name.replaceAll(/[^a-zA-Z0-9_\-]/gi,'');
+                return '`'+name+'`';
+            }).join(",");
+            
+            const values = query.fields.map(field=>{
+                let val = field;
+                if(typeof val.value === "string" && val.value.indexOf("!@")!==0){
+                    val.value = val.value?val.value.replaceAll('"','\\"'):null
+                    val.value = '"'+val.value+'"'
+                }
+                if(typeof val.value === "string" && val.value.indexOf("!@")===0){
+                    val.value=val.value.substring(2)
+                }
+                return val.value;
+            }).join(",")
+
+            // Add update query
+            let updateQuery="";
+            if(query.onUpdate && Array.isArray(query.onUpdate) && query.onUpdate.length>0){
+                updateQuery="ON DUPLICATE KEY UPDATE "
+                let j=0;
+                for(let i of query.onUpdate){
+                    if(j>0)
+                        updateQuery+=","
+                    updateQuery+=" `"+i.name+"` = \""+i.value+'" '
+                    j++;
+                }
+            }
+
             if(rawQuery.length>0)
                 rawQuery+=";\n";
-            rawQuery +=  `INSERT INTO \`${query.table}\` (${names}) VALUES (${values})`
+
+            
+            rawQuery +=  `INSERT INTO \`${query.table}\` (${names}) VALUES (${values}) ${updateQuery}`
         }
         return rawQuery;
     }
@@ -134,10 +166,12 @@ class MySQL extends BaseService{
         let rawQuery="";
         for(let query of q){
             let tmp=query.query
+            
             for(let i in query.fields){
                 const val = `${query.fields[i]}`.replaceAll('"','\\"');
                 tmp=tmp.replaceAll("@"+i,val)
             }
+
             if(tmp.toLowerCase().indexOf("select")===0 && tmp.toLowerCase().indexOf("limit")===-1)
                 tmp+=" LIMIT 100"
             if(rawQuery.length>0)
