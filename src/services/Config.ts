@@ -8,6 +8,7 @@ class Config extends BaseService{
      127.0.0.1:8888
     */
     data:ConfigVO={
+        VERSION:"0.0.05",
         HTTP_SERVICE_PORT:8080,
         HTTP_PUBLIC_DIR:"public",
         HTTP_TIMEOUT:1000*30,
@@ -17,7 +18,8 @@ class Config extends BaseService{
         SQL_PASSWD:"{crm_iMpaya71)",
         SQL_MAX_CONNECTIONS:10,
 
-        IMPAYA_SERVER_USER_UID:"NBcaU1GMlI5vUWw"
+        IMPAYA_SERVER_USER_UID:"NBcaU1GMlI5vUWw",
+        MAJOR_DB_DATE_FIELD:"ut_updated"
     }
 
     constructor(){

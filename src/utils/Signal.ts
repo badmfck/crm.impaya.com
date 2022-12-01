@@ -6,6 +6,7 @@ class Signal<T> {
     private tempRem:{cb?:(data:T)=>void,id?:string}[]=[];
     private tempInvoke:{data:T}[]=[];
     private callbacks:{cb:(data:T)=>void,id:string}[]=[];
+    private tempClear = false;
     constructor(name?:string){}
 
     add(callback:(data:T)=>void,id?:string):string{
@@ -29,6 +30,14 @@ class Signal<T> {
         }
         this.callbacks.push({cb:callback,id:id});
         return id;
+    }
+
+    clear(){
+        if(this.busy){
+            this.tempClear = true;
+            return;
+        }
+        this.callbacks = [];
     }
 
     remove(callback?:(data:T)=>void,id?:string){
@@ -95,6 +104,8 @@ class Signal<T> {
         for(let i of this.tempInvoke){
             this.invoke(i.data)
         }
+        if(this.tempClear)
+            this.clear();
     }
 }
 

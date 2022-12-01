@@ -33,5 +33,16 @@ class Errors{
    static TRX_NO_TRANSACTION_ID:ErrorVO={code:101,message:"no transaction_id"}
    static TRX_NO_TRANSACTION_STATUS:ErrorVO={code:102,message:"no status_id"}
    static WRONG_SERVER_USER:ErrorVO={code:103,message:"wrong server user"}
+
+
+   // CLIENTS
+   static CLIENTS_CANT_GET_CLIENTS:ErrorVO={code:201,message:"can't get clients"}
+   static CLIENTS_CANT_GET_MERCHANTS:ErrorVO={code:202,message:"can't get merchants"}
+
+   // BALANCE
+   static BALANCE_NO_RATES:ErrorVO = {code:300,message:"No rates"}
+
+   //SOLUTIONS
+   static SOLUTIONS_CANT_LOAD:ErrorVO = {code:400,message:"Solutions not loaded"}
 }
 export default Errors;

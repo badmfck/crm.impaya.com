@@ -6,6 +6,7 @@ declare interface SimpleObjectVO{
 
 
 declare interface ConfigVO{
+    VERSION:string
     HTTP_SERVICE_PORT:number
     HTTP_PUBLIC_DIR:string
     HTTP_TIMEOUT:number
@@ -17,6 +18,8 @@ declare interface ConfigVO{
     SQL_MAX_CONNECTIONS:number
 
     IMPAYA_SERVER_USER_UID:string
+
+    MAJOR_DB_DATE_FIELD:"ut_created"|"ut_updated";
 }
 
 declare interface TransferPacketVO{
@@ -24,6 +27,7 @@ declare interface TransferPacketVO{
     data:any
     responseTime?:number
     encrypted?:boolean
+    version?:string
 }
 
 declare interface ExecutionParamsVO{
@@ -47,8 +51,8 @@ declare interface MySQLQueryVO{
 }
 declare interface MySQLInsertQueryVO{
     table:string,
-    fields:{name:string,value:string|null|boolean|number}[],
-    onUpdate?:{name:string,value:string|null|boolean|number}[]
+    fields:{name:string,value:string|null|boolean|number,system?:boolean}[],
+    onUpdate?:{name:string,value:string|null|boolean|number,system?:boolean}[]
 }
 
 declare interface MySQLResult{
@@ -98,6 +102,10 @@ declare interface TransactionVO{
     rate:string,
     description:string,
     hash:string
+    psys_alias
+
+    merchant?:MerchantVO;
+    solution?:SolutionVO
 }
 
 declare interface TRXAddPacketVO{
@@ -117,4 +125,24 @@ declare interface AuthAddUserPacketVO{
 declare interface AuthLoginPacketVO{
     login?:string,
     password?:string
+}
+
+declare interface ClientVO{
+    id:number,
+    name:string,
+    merchants?:MerchantVO[]
+}
+declare interface MerchantVO{
+    id:number,
+    client_id:number,
+    name:string,
+    client?:ClientVO
+}
+
+declare interface SolutionVO{
+    id:number
+	alias:string			
+	title:string	
+	description:string
+	ctime:number
 }

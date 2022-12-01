@@ -10,7 +10,7 @@ class BaseHandler implements IAPIHandler{
     async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
         return {
             error:Errors.NO_METHOD_IMPLEMENTATION,
-            data:null
+            data:this.name+"."+packet.method
         }
     }
 }

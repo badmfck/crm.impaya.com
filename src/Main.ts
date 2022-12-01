@@ -15,23 +15,32 @@ class Main {
     constructor(){ this.init() }
 
     private async init(){
+        process.env.TZ = "Europe/Riga"
         await this.initializeServices();
         GD.S_APP_READY.invoke();
-        console.log("APP LAUNCHED")
 
+        const buff = fs.readFileSync("data/psystems.json")
 
-    
-        let rawdata = fs.readFileSync('data/merchants.json');
-        let data = JSON.parse(rawdata.toString("utf-8"));
-        let q= "INSERT INTO `merchants` (`id`,`name`,`client_id`) VALUES";
-        let z = 0;
-        for(let i of data){
-            if(z>0)
-            q+=", ";
-            q+=' ("'+i.id+'","'+i.name.replaceAll('"','\\"')+'","'+i.client_id+'") '
-            z++;
+        const arr =JSON.parse(buff.toString("utf-8"))
+        
+        
+       /* const query:MySQLInsertQueryVO[]= [];
+        for(let i of arr){
+            query.push({
+                table:"solutions",
+                fields:[
+                    {name:"id",value:parseInt(i.id)},
+                    {name:"alias",value:i.alias},
+                    {name:"title",value:i.title},
+                    {name:"description",value:i.title_orig}
+                ]
+            })
         }
-        fs.writeFileSync("data/client_q.txt",q)
+
+        GD.S_REQ_MYSQL_INSERT_QUERY.request(query)*/
+      
+
+        console.log("APP LAUNCHED")
     }
 
     private async initializeServices():Promise<void>{

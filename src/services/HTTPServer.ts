@@ -10,6 +10,8 @@ import Transactions from "./api/Transactions";
 import Clients from "./api/Clients";
 import { IncomingHttpHeaders } from "http";
 import cors from "cors"
+import Balance from "./api/Balance";
+import Solutions from "./api/Solutions";
 
 
 
@@ -17,7 +19,9 @@ interface HandlersVO{
     [key:string]:IAPIHandler
     auth:Auth,
     trx:Transactions,
-    clients:Clients
+    clients:Clients,
+    balance:Balance,
+    solutions:Solutions
 }
 class HTTPServer extends BaseService{
 
@@ -26,7 +30,9 @@ class HTTPServer extends BaseService{
     private handlers:HandlersVO = {
         auth:new Auth(),
         trx:new Transactions(),
-        clients:new Clients()
+        clients:new Clients(),
+        balance:new Balance(),
+        solutions:new Solutions()
     }
 
     constructor(){
@@ -287,6 +293,7 @@ class HTTPServer extends BaseService{
     sendResponse(res:Response,data:TransferPacketVO,requestTime:number){
         //TODO: make logger, cut big packets
         data.responseTime = (+new Date()) - requestTime;
+        data.version = this.cfg?.VERSION
         if(res.destroyed || res.closed){
             console.error("Connection already closed, can't send response",data)
             return;
