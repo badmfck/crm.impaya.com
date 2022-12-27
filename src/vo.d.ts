@@ -146,3 +146,9 @@ declare interface SolutionVO{
 	description:string
 	ctime:number
 }
+
+declare interface CurrencyVO{
+    id:number
+    name:string
+    code:string
+}

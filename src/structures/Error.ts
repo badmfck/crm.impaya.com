@@ -44,5 +44,12 @@ class Errors{
 
    //SOLUTIONS
    static SOLUTIONS_CANT_LOAD:ErrorVO = {code:400,message:"Solutions not loaded"}
+
+   static CURRENCIES_CANT_LOAD:ErrorVO = {code:500,message:"Currencies not loaded"}
+
+   // SYS
+   static CORE_CONCURENCY_LOADER_NO_PROCEDURE:ErrorVO = {code:10000,message:"Concurency loader has no loading procedure"}
+   static CORE_CONCURENCY_LOADER_NO_DATA:ErrorVO = {code:10001,message:"Concurency loader has no data loaded"}
+   static CORE_CONCURENCY_LOADER_NO_RESULT:ErrorVO = {code:10002,message:"Concurency loader has no result"}
 }
 export default Errors;

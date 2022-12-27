@@ -9,7 +9,7 @@ class Solutions extends BaseHandler{
     loading=false;
     onDataLoaded:Signal<ErrorVO|null>=new Signal();
     lastUpdated=0;
-    updateCacheTime = 1000*60*60*24*15; // 15 days
+    updateCacheTime = 1000*60*60*24*15; // 15 days 
 
     constructor(){
         super("Solutions")
@@ -24,8 +24,18 @@ class Solutions extends BaseHandler{
         switch(packet.method){
             case "get":
             return this.get(packet)
+            case "update":
+            return this.update(packet)
         }
         return super.execute(packet);
+    }
+
+    async update(packet: ExecutionParamsVO): Promise<TransferPacketVO> {
+       // const sol:SolutionVO = packet.data as SolutionVO;
+        return {
+            error:null,
+            data:Array.from(this.solutions?.values() ?? [])
+        }
     }
 
     async get(packet: ExecutionParamsVO): Promise<TransferPacketVO> {

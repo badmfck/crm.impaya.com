@@ -31,8 +31,15 @@ class Transactions extends BaseHandler{
 
         // TODO: CHECK ROLES
 
+        let dateTime = (packet.data as SimpleObjectVO).day;
+        if(!dateTime || dateTime<1)
+            dateTime = +new Date();
+        const month = Helper.dateFormatter.format(dateTime,"%m");
+
+        //TODO: get from stored values
+
         const mysql = await GD.S_REQ_MYSQL_SELECT.request({
-            query:"SELECT * FROM trx_11 ORDER BY `ut_updated` DESC LIMIT 100",
+            query:"SELECT * FROM trx_"+month+" ORDER BY `ut_updated` DESC LIMIT 100",
             fields:{}
         })
 
@@ -143,6 +150,8 @@ class Transactions extends BaseHandler{
             if(i === this.config.MAJOR_DB_DATE_FIELD)
                 monthTimestamp = parseInt((trx.transaction as any)[i])
         }
+
+        // FIX ut_updated 
         
         //TODO: TABLE PREFIX MUST BE AS TRANSACTION UPDATE TIME!!!
 
@@ -184,6 +193,11 @@ class Transactions extends BaseHandler{
                     {
                         name:"psys_alias",
                         value:trx.transaction.psys_alias 
+                    }
+                    ,
+                    {
+                        name:"ref_transaction_id",
+                        value:trx.transaction.ref_transaction_id 
                     }
                 
                 

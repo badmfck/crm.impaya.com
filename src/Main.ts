@@ -8,6 +8,7 @@ import Packer from "./utils/Packer";
 import EventService from "./services/EventService";
 
 import fs from "fs"
+import Rates from "./services/Rates";
 
 
 class Main {
@@ -19,25 +20,27 @@ class Main {
         await this.initializeServices();
         GD.S_APP_READY.invoke();
 
-        const buff = fs.readFileSync("data/psystems.json")
+        //const buff = fs.readFileSync("data/psystems.json")
 
-        const arr =JSON.parse(buff.toString("utf-8"))
-        
-        
-       /* const query:MySQLInsertQueryVO[]= [];
-        for(let i of arr){
+       // const arr =JSON.parse(buff.toString("utf-8"))
+
+        /*
+        const query:MySQLInsertQueryVO[]= [];
+        for(let j in arr as any){
+            const i = (arr as any)[j]
             query.push({
-                table:"solutions",
+                table:"currencies_list",
                 fields:[
-                    {name:"id",value:parseInt(i.id)},
-                    {name:"alias",value:i.alias},
-                    {name:"title",value:i.title},
-                    {name:"description",value:i.title_orig}
+                    {name:"code",value:i.code},
+                    {name:"name",value:i.name},
+                    {name:"decimal",value:i.decimal_digits+""},
+                    {name:"rounding",value:i.rounding+""}
                 ]
             })
         }
 
-        GD.S_REQ_MYSQL_INSERT_QUERY.request(query)*/
+       const r = await GD.S_REQ_MYSQL_INSERT_QUERY.request(query)
+       console.log(r)*/
       
 
         console.log("APP LAUNCHED")
@@ -50,7 +53,8 @@ class Main {
                 Config,
                 HTTPServer,
                 MySQL,
-                EventService
+                EventService,
+                Rates
             ]
 
             GD.S_SERVICE_READY.add(name=>{

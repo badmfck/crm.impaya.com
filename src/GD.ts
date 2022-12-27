@@ -14,4 +14,6 @@ export class GD{
     static S_SOLUTIONS_REQUEST:SyncSignal<void,{solutuions:Map<string,SolutionVO>|null,err:ErrorVO|null}>=new SyncSignal();
 
     static S_EVENT_ADD:Signal<EventPacketVO>=new Signal();
+
+    static S_REQUEST_CURRENCY_NAMES:SyncSignal<void,{currencies:Map<string,CurrencyVO>|null,err:ErrorVO|null}>=new SyncSignal();
 }

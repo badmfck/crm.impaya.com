@@ -12,6 +12,7 @@ import { IncomingHttpHeaders } from "http";
 import cors from "cors"
 import Balance from "./api/Balance";
 import Solutions from "./api/Solutions";
+import Currencies from "./api/Currencies";
 
 
 
@@ -32,7 +33,8 @@ class HTTPServer extends BaseService{
         trx:new Transactions(),
         clients:new Clients(),
         balance:new Balance(),
-        solutions:new Solutions()
+        solutions:new Solutions(),
+        currencies:new Currencies()
     }
 
     constructor(){
