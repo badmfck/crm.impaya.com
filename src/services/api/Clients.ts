@@ -22,12 +22,12 @@ class Clients extends BaseHandler{
             });
         }
     }
-    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
         return super.execute(packet);
     }
 
 
-    async getClients(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async getClients(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
        
         const data = await GD.S_CLIENTS_REQUEST.request();
 
@@ -44,7 +44,7 @@ class Clients extends BaseHandler{
         }
     }
 
-    async getMerchants(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async getMerchants(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
        
         const data = await GD.S_CLIENTS_REQUEST.request();
 

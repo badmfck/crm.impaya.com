@@ -11,9 +11,12 @@ export class GD{
 
     static S_CLIENTS_REQUEST:SyncSignal<void,{clients:Map<number,ClientVO>,merchants:Map<number,MerchantVO>,err:ErrorVO|null}>=new SyncSignal();
     
-    static S_SOLUTIONS_REQUEST:SyncSignal<void,{solutuions:Map<string,SolutionVO>|null,err:ErrorVO|null}>=new SyncSignal();
+    static S_SOLUTIONS_REQUEST:SyncSignal<void,TransferPacketVO<SolutionVO[]>>=new SyncSignal();
+    static S_SOLUTION_TYPES_REQUEST:SyncSignal<void,TransferPacketVO<{name:string,id:number}[]>>=new SyncSignal();
 
     static S_EVENT_ADD:Signal<EventPacketVO>=new Signal();
 
-    static S_REQUEST_CURRENCY_NAMES:SyncSignal<void,{currencies:Map<string,CurrencyVO>|null,err:ErrorVO|null}>=new SyncSignal();
+    static S_REQUEST_CURRENCY_NAMES:SyncSignal<void,TransferPacketVO<Map<string,CurrencyVO>>>=new SyncSignal();
+    
+    static S_PAY_SERVICES_GET_TYPES:SyncSignal<void,TransferPacketVO<{name:string,id:number}[]>>=new SyncSignal();
 }

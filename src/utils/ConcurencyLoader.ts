@@ -1,23 +1,20 @@
-import e from "express";
 import Errors from "../structures/Error";
 import Signal from "./Signal";
 
-class ConcurencyLoader<K,T>{
+class ConcurencyLoader<T>{
     
-    data:Map<K,T>|null=null; // alias
+    data:T|null=null; // alias
     loading=false;
-    onDataLoaded:Signal<ErrorVO|null>=new Signal();
-    setLoadingProcedure?:()=>Promise<{error?:ErrorVO|null,result?:Map<K,T>|null}>
+    onDataLoaded:Signal<TransferPacketVO<T>>=new Signal();
+    setLoadingProcedure?:()=>Promise<TransferPacketVO<T>>
     lastUpdate = 0;
 
-    constructor(){
+    constructor(){}
 
-    }
+    async load(cb:(resp:TransferPacketVO<T>)=>void){
 
-    async load(cb:(err:ErrorVO|null)=>void){
-
-        if(this.data && this.data.size>0){
-            cb(null);
+        if(this.data){
+            cb({data:this.data,error:null});
             return;
         }
 
@@ -28,19 +25,22 @@ class ConcurencyLoader<K,T>{
         
         this.loading=true;
         let err=null;
-        let res
+        let res:TransferPacketVO<T>
    
         if(this.setLoadingProcedure){
             res = await this.setLoadingProcedure();
         }else{
-            err = Errors.CORE_CONCURENCY_LOADER_NO_PROCEDURE
+            res={
+                error:Errors.CORE_CONCURENCY_LOADER_NO_PROCEDURE,
+                data:null
+            }
         }
 
         if(res){
             if(res.error){
                 err = res.error
-            }else if(res.result){
-                this.data = res.result
+            }else if(res.data){
+                this.data = res.data
             }else{
                 err = Errors.CORE_CONCURENCY_LOADER_NO_DATA
             }
@@ -50,7 +50,7 @@ class ConcurencyLoader<K,T>{
 
         this.lastUpdate = +new Date();
         this.loading = false;
-        this.onDataLoaded.invoke(err);
+        this.onDataLoaded.invoke(res);
         this.onDataLoaded.clear();
     }
 }

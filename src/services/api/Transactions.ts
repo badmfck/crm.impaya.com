@@ -16,7 +16,7 @@ class Transactions extends BaseHandler{
         this.config = await GD.S_CONFIG_REQUEST.request();
     }
 
-    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
 
         switch(packet.method){
             case "add":
@@ -27,7 +27,7 @@ class Transactions extends BaseHandler{
         return super.execute(packet);
     }
 
-    async request(packet:ExecutionParamsVO):Promise<TransferPacketVO>{
+    async request(packet:ExecutionParamsVO):Promise<TransferPacketVO<any>>{
 
         // TODO: CHECK ROLES
 
@@ -56,7 +56,7 @@ class Transactions extends BaseHandler{
 
         const clientsData = await GD.S_CLIENTS_REQUEST.request();
 
-        const solutionsData = await GD.S_SOLUTIONS_REQUEST.request();
+       // const solutionsData = await GD.S_SOLUTIONS_REQUEST.request();
         
         for(let i of mysql.data){
             const t:TransactionVO = i;
@@ -75,16 +75,16 @@ class Transactions extends BaseHandler{
                     }
                 }
             }
-            if(!solutionsData.err && solutionsData.solutuions){
+           /* if(!solutionsData.err && solutionsData.solutuions){
                 i.solution = solutionsData.solutuions.get(i.psys_alias)
-            }
+            }*/
         }
 
         return {error:null,data:mysql.data}
     }
 
 
-    async add(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async add(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
         if(packet.httpMethod!=="post"){
             return {
                 error:Errors.WRONG_HTTP_METHOD,

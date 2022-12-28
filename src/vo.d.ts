@@ -4,6 +4,10 @@ declare interface SimpleObjectVO{
     [key:string]:string|number|boolean|SimpleObjectVO|Array<SimpleObjectVO>|Array<string>|Array<number>|null|undefined
 }
 
+declare interface NamedValueVO{
+    name:string,
+    value:string|boolean|number
+}
 
 declare interface ConfigVO{
     VERSION:string
@@ -22,9 +26,9 @@ declare interface ConfigVO{
     MAJOR_DB_DATE_FIELD:"ut_created"|"ut_updated";
 }
 
-declare interface TransferPacketVO{
+declare interface TransferPacketVO<T>{
     error:ErrorVO|null,
-    data:any
+    data:T|null
     responseTime?:number
     encrypted?:boolean
     version?:string
@@ -139,16 +143,46 @@ declare interface MerchantVO{
     client?:ClientVO
 }
 
-declare interface SolutionVO{
-    id:number
-	alias:string			
-	title:string	
-	description:string
-	ctime:number
-}
-
 declare interface CurrencyVO{
     id:number
     name:string
     code:string
+}
+declare interface PayServiceVO{
+    id:number,
+    service_id:number,
+    currency_id:number,
+    alias:string,
+    ctime:number,
+    utime:number,
+    fee_proc:number,
+    fix_success:number,
+    fix_decline:number,
+    fx_fee:number,
+    chargeback:number,
+    refund:number,
+    settlement_fee:number,
+    settlement_fee_proc:number,
+    rolling_proc:number,
+    rolling_period:number,
+    rolling_deposit:number
+}
+
+declare interface SolutionVO{
+    [key:string]
+    id:number
+	common:{
+        name:string,
+        type:number
+    },
+    contacts:{
+        id:number,
+        email:string,
+        phone:string,
+        country:string,
+        city:string,
+        zip:string,
+        street:string
+    },
+    services:PayServiceVO[]
 }

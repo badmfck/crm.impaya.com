@@ -6,16 +6,14 @@ import BaseHandler from "./BaseHandler";
 
 class Currencies extends BaseHandler{
     
-    concurencyLoader:ConcurencyLoader<string,CurrencyVO>;
-    loading=false;
-    onDataLoaded:Signal<ErrorVO|null>=new Signal();
+    concurencyLoader:ConcurencyLoader<Map<string,CurrencyVO>>;
 
     constructor(){
-        super("Currencies")
+        super("currencies")
         this.concurencyLoader = new ConcurencyLoader();
 
         this.concurencyLoader.setLoadingProcedure = async ()=>{
-            // Request clients
+            // Request currencies
             const curr = await GD.S_REQ_MYSQL_SELECT.request({
                 query: "SELECT * FROM `currencies_list` @NOLIMIT",
                 fields:{}
@@ -30,16 +28,34 @@ class Currencies extends BaseHandler{
                 err=Errors.CURRENCIES_CANT_LOAD
                 console.error(curr.err)
             }
-            
-            return {error:err,result:result}
+
+            return {error:err,data:result}
         }
 
         GD.S_REQUEST_CURRENCY_NAMES.listener=(data,cb)=>{
-            this.concurencyLoader.load((err:ErrorVO|null)=>{
-                cb({currencies:this.concurencyLoader.data,err})
-            });
+            this.concurencyLoader.load(cb);
         }
     }
+
+    execute(packet: ExecutionParamsVO): Promise<TransferPacketVO<any>> {
+        switch(packet.method){
+            case "get":
+            return this.get(packet)
+        }
+        return super.execute(packet);
+    }
+
+    async get(packet: ExecutionParamsVO): Promise<TransferPacketVO<any>> {
+        const res = await GD.S_REQUEST_CURRENCY_NAMES.request();
+        let d=null;
+        if(res.data && res.data.size>0)
+            d = Array.from(res.data.values())
+        return {
+            error:res.error,
+            data:d
+        }
+    }
+
 
    
 }

@@ -44,8 +44,18 @@ class Errors{
 
    //SOLUTIONS
    static SOLUTIONS_CANT_LOAD:ErrorVO = {code:400,message:"Solutions not loaded"}
+   static SOLUTIONS_WRONG_SOLUTION_OBJECT:ErrorVO = {code:401,message:"Solutions object is worng or not exists"}
+   static SOLUTIONS_CANT_LOAD_TYPES:ErrorVO = {code:402,message:"Can't load solution types"}
+   static SOLUTION_CANT_SAVE_DUPLICATE:ErrorVO = {code:403,message:"Solution already exists"}
+   static SOLUTIONS_CANT_CHECK_PAYSERVICE_ALIAS:ErrorVO = {code:404,message:"Cant check payservice alias"}
+   static SOLUTIONS_PAYSERVICE_ALIAS_ALREADY_EXISTS:ErrorVO = {code:405,message:"Payservice alias already exists"}
+   static SOLUTIONS_PAYSERVICE_SAVE_ERROR:ErrorVO = {code:406,message:"Can't save payservice"}
+   static SOLUTIONS_PAYSERVICE_CANT_UPDATE_ALIAS:ErrorVO = {code:407,message:"Can't update alias"}
+   static SOLUTIONS_CANT_SAVE_CONTACT_INFO:ErrorVO = {code:408,message:"Can't save contact info"}
 
    static CURRENCIES_CANT_LOAD:ErrorVO = {code:500,message:"Currencies not loaded"}
+
+   static PAYSERVICES_CANT_LOAD:ErrorVO = {code:600,message:"Payservice not loaded"}
 
    // SYS
    static CORE_CONCURENCY_LOADER_NO_PROCEDURE:ErrorVO = {code:10000,message:"Concurency loader has no loading procedure"}

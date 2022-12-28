@@ -14,7 +14,7 @@ class Balance extends BaseHandler{
         this.config = await GD.S_CONFIG_REQUEST.request();
     }
 
-    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
         switch(packet.method){
             case "getDayBalance":
             return this.getDayBalance(packet);
@@ -22,7 +22,7 @@ class Balance extends BaseHandler{
         return super.execute(packet);
     }
 
-    async getDayBalance(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async getDayBalance(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
 
 
         // LOADING DATA FROM MYSQL

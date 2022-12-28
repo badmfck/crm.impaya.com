@@ -15,7 +15,7 @@ class Auth extends BaseHandler{
 
 
     async init(){}
-    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async execute(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
 
         if(packet.httpMethod!=="post"){
             return {
@@ -40,7 +40,7 @@ class Auth extends BaseHandler{
        
     }
 
-    async check(packet:ExecutionParamsVO):Promise<TransferPacketVO>{
+    async check(packet:ExecutionParamsVO):Promise<TransferPacketVO<any>>{
         if(!packet.user){
             return {
                 error:Errors.UNAUTHORIZED_ACCESS,
@@ -53,7 +53,7 @@ class Auth extends BaseHandler{
         }
     }
 
-    async getIP(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async getIP(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
 
         return {
             error:null,
@@ -65,7 +65,7 @@ class Auth extends BaseHandler{
         }
     }
 
-    async addUser(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async addUser(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
 
         if(!packet.user || !packet.user.role_admin){
             return {
@@ -106,7 +106,7 @@ class Auth extends BaseHandler{
 
     }
 
-    async login(packet: ExecutionParamsVO):Promise<TransferPacketVO>{
+    async login(packet: ExecutionParamsVO):Promise<TransferPacketVO<any>>{
 
         const request:AuthAddUserPacketVO=packet.data as any;
         const validationError = this.validateLoginAndPass(request);
@@ -312,7 +312,7 @@ class Auth extends BaseHandler{
     }
 
     // HELPERS
-    validateLoginAndPass(request:any):TransferPacketVO|null{
+    validateLoginAndPass(request:any):TransferPacketVO<any>|null{
 
         if(!request.login || !request.password){
             return {

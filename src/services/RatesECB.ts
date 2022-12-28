@@ -38,11 +38,10 @@ class RatesECB{
 
         const cres = await GD.S_REQUEST_CURRENCY_NAMES.request();
         let currencyNames:Map<string,CurrencyVO>|null = null;
-        if(cres && !cres.err && cres.currencies)
-            currencyNames = cres.currencies
+        if(cres && !cres.error && cres.data)
+            currencyNames = cres.data
 
         const resp  = await axios.get<string>(this.urlDaily);
-        console.log(this.urlDaily)
 
         if(resp.status<200 || resp.status>399){
             console.error("ecb request error")
@@ -62,7 +61,7 @@ class RatesECB{
             // check time
             if(time && typeof time === "string" && time.length>5 && time === this.lastUpdateDate){
                 this.loading =false;
-                console.error("Wrong date format in xml")
+                console.error("Wrong date format in xml ",time)
                 return true;
             }
             this.lastUpdateDate = time;

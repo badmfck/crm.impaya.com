@@ -13,6 +13,7 @@ import cors from "cors"
 import Balance from "./api/Balance";
 import Solutions from "./api/Solutions";
 import Currencies from "./api/Currencies";
+import Payservice from "./api/Payservices";
 
 
 
@@ -22,7 +23,9 @@ interface HandlersVO{
     trx:Transactions,
     clients:Clients,
     balance:Balance,
-    solutions:Solutions
+    solutions:Solutions,
+    currencies:Currencies,
+    payservice:Payservice
 }
 class HTTPServer extends BaseService{
 
@@ -34,7 +37,8 @@ class HTTPServer extends BaseService{
         clients:new Clients(),
         balance:new Balance(),
         solutions:new Solutions(),
-        currencies:new Currencies()
+        currencies:new Currencies(),
+        payservice:new Payservice()
     }
 
     constructor(){
@@ -154,7 +158,7 @@ class HTTPServer extends BaseService{
         this.route(res,req.method.toLowerCase(),ip,packet,req.headers,tme)
     }
 
-    async route(res:Response,httpMethod:string,ip:string,packet:TransferPacketVO,headers:IncomingHttpHeaders,tme:number){
+    async route(res:Response,httpMethod:string,ip:string,packet:TransferPacketVO<any>,headers:IncomingHttpHeaders,tme:number){
         const request = packet.data as SimpleObjectVO;
 
             if(!("method" in request) || typeof request.method !== "string"){
@@ -232,7 +236,7 @@ class HTTPServer extends BaseService{
             this.sendResponse(res,response,tme);
     }
 
-    parsePacket(cdata:any):TransferPacketVO{
+    parsePacket(cdata:any):TransferPacketVO<any>{
 
 
         let json = null;
@@ -292,7 +296,7 @@ class HTTPServer extends BaseService{
 
     }
 
-    sendResponse(res:Response,data:TransferPacketVO,requestTime:number){
+    sendResponse(res:Response,data:TransferPacketVO<any>,requestTime:number){
         //TODO: make logger, cut big packets
         data.responseTime = (+new Date()) - requestTime;
         data.version = this.cfg?.VERSION
