@@ -175,7 +175,7 @@ class HTTPServer extends BaseService{
                 this.sendResponse(res, {
                     error:Errors.WRONG_METHOD,
                     data:null
-                },tme)
+                },tme,request.method)
                 return;
             }
             moduleName=moduleName.toLowerCase();
@@ -191,7 +191,7 @@ class HTTPServer extends BaseService{
                     this.sendResponse(res,{
                         error:Errors.RUNTIME_ERROR,
                         data:`${e}`
-                    },tme)
+                    },tme,request.method)
                     return;
                 }
             }
@@ -201,7 +201,7 @@ class HTTPServer extends BaseService{
                 this.sendResponse(res,{
                     error:Errors.UNAUTHORIZED_ACCESS,
                     data:null
-                },tme)
+                },tme,request.method)
                 return;
             }
 
@@ -221,7 +221,7 @@ class HTTPServer extends BaseService{
                 this.sendResponse(res,{
                     error:Errors.RUNTIME_ERROR,
                     data:`${e}`
-                },tme)
+                },tme,request.method)
                 return;
             }
             
@@ -229,11 +229,11 @@ class HTTPServer extends BaseService{
                 this.sendResponse(res,{
                     error:Errors.EMPTY_RESPONSE,
                     data:null
-                },tme)
+                },tme,request.method)
                 return;
             }
             
-            this.sendResponse(res,response,tme);
+            this.sendResponse(res,response,tme,request.method);
     }
 
     parsePacket(cdata:any):TransferPacketVO<any>{
@@ -295,17 +295,18 @@ class HTTPServer extends BaseService{
         }
 
     }
+    
 
-    sendResponse(res:Response,data:TransferPacketVO<any>,requestTime:number){
+    sendResponse(res:Response,data:TransferPacketVO<any>,requestTime:number,method?:string){
         //TODO: make logger, cut big packets
         data.responseTime = (+new Date()) - requestTime;
         data.version = this.cfg?.VERSION
+        data.method = method ?? "no_method"
         if(res.destroyed || res.closed){
             console.error("Connection already closed, can't send response",data)
             return;
         }
         try{
-            
             res.send(data);
         }catch(e){
             console.error("Can't send response! ",e)

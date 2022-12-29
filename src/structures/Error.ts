@@ -52,10 +52,14 @@ class Errors{
    static SOLUTIONS_PAYSERVICE_SAVE_ERROR:ErrorVO = {code:406,message:"Can't save payservice"}
    static SOLUTIONS_PAYSERVICE_CANT_UPDATE_ALIAS:ErrorVO = {code:407,message:"Can't update alias"}
    static SOLUTIONS_CANT_SAVE_CONTACT_INFO:ErrorVO = {code:408,message:"Can't save contact info"}
+   static SOLUTIONS_NO_SOLUTION_ID:ErrorVO = {code:409,message:"No solution id"}
+   static SOLUTIONS_CANT_FIND_SPECIFIC_SOLUTION:ErrorVO = {code:410,message:"Can't find specific solution"}
 
    static CURRENCIES_CANT_LOAD:ErrorVO = {code:500,message:"Currencies not loaded"}
 
    static PAYSERVICES_CANT_LOAD:ErrorVO = {code:600,message:"Payservice not loaded"}
+
+   static CONTACTS_CANT_LOAD:ErrorVO = {code:700,message:"Can't load contacts"}
 
    // SYS
    static CORE_CONCURENCY_LOADER_NO_PROCEDURE:ErrorVO = {code:10000,message:"Concurency loader has no loading procedure"}

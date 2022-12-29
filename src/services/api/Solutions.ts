@@ -4,6 +4,7 @@ import Helper from "../../Helper";
 import Errors from "../../structures/Error";
 import ConcurencyLoader from "../../utils/ConcurencyLoader";
 import Signal from "../../utils/Signal";
+import MySQL from "../Mysql";
 import BaseHandler from "./BaseHandler";
 
 class Solutions extends BaseHandler{
@@ -17,9 +18,9 @@ class Solutions extends BaseHandler{
 
         this.solutions.setLoadingProcedure=async ()=>{
 
-             // Request clients
-            const sql = await GD.S_REQ_MYSQL_SELECT.request({
-                query: "SELECT * FROM `solutions` LIMIT 1000",
+             // Request solutions
+            let sql = await GD.S_REQ_MYSQL_SELECT.request({
+                query: "SELECT * FROM `solutions` WHERE `status` = \"active\" LIMIT 1000",
                 fields:{}
             })
 
@@ -30,9 +31,86 @@ class Solutions extends BaseHandler{
                 }
             }
 
+            const sol = sql.data;
+            const ids = []
+            for(let i of sol){
+                ids.push(i.id);
+            }
+
+            sql = await GD.S_REQ_MYSQL_SELECT.request({
+                query:`SELECT * FROM \`pay_services\` WHERE \`status\`="active" AND \`solution_id\` in (${ids.join(",")})`,
+                fields:{}
+            })
+
+            if(sql.err || !sql.data){
+                return {
+                    error:Errors.PAYSERVICES_CANT_LOAD,
+                    data:null
+                }
+            }
+
+            const payservices = sql.data
+
+            sql = await GD.S_REQ_MYSQL_SELECT.request({
+                query:`SELECT * FROM \`contacts\` WHERE \`target_id\` in (${ids.join(",")})`,
+                fields:{}
+            })
+
+            if(sql.err || !sql.data){
+                return {
+                    error:Errors.CONTACTS_CANT_LOAD,
+                    data:null
+                }
+            }
+
+            const contacts = sql.data
+
+            const solutions:SolutionVO[] = [];
+            for(let i of sol){
+
+                // add contact info
+                let c = null;
+                if(contacts && Array.isArray(contacts)){
+                    for(let j=0;j<contacts.length;j++){
+                        if(contacts[j].target_id === i.id){
+                            c = contacts[j];
+                            (contacts as Array<any>).splice(j,1);
+                            break;
+                        }
+                    }
+                }
+
+                //add pay info
+                const p:PayServiceVO[] = []
+                if(payservices && Array.isArray(payservices)){
+                    for(let j=0;j<payservices.length;j++){
+                        if(payservices[j].solution_id === i.id){
+                            p.push(payservices[j]);
+                            (payservices as Array<any>).splice(j,1);
+                            break;
+                        }
+                    }
+                }
+
+                const s = {
+                    id:i.id,
+                    ctime:i.ctime,
+                    utime:i.utime,
+                    common:{
+                        name:i.name,
+                        type_id:i.type_id
+                    },
+                    contacts:c,
+                    services:p
+                }
+
+                solutions.push(s)
+
+            }
+
             return {
                 error:null,
-                data:sql.data
+                data:solutions
             }
         }
 
@@ -80,6 +158,8 @@ class Solutions extends BaseHandler{
         return types;
     }
 
+    
+
     async update(packet: ExecutionParamsVO): Promise<TransferPacketVO<any>> {
         const sol:SolutionVO = this.createSolutionVO(packet)
         if(!sol){
@@ -100,13 +180,13 @@ class Solutions extends BaseHandler{
         }
 
         // add solution
-        const hash = Helper.passhash(sol.common.name.toLowerCase()+"_"+sol.common.type);
+        const hash = Helper.passhash(sol.common.name.toLowerCase()+"_"+sol.common.type_id);
 
         let sql = await GD.S_REQ_MYSQL_INSERT_QUERY.request({
             table:"solutions",
             fields:[
                 {name:"name",value:sol.common.name},
-                {name:"type_id",value:sol.common.type},
+                {name:"type_id",value:sol.common.type_id},
                 {name:"hash",value:hash}
             ]
         })
@@ -222,7 +302,7 @@ class Solutions extends BaseHandler{
                 // update alias
                 i.id = sql.data.insertId;
                 if(alias === null){
-                    alias=Helper.passhash(sol.common.name+"_"+sol.common.type+"_"+hash);
+                    alias=Helper.passhash(sol.common.name+"_"+sol.common.type_id+"_"+hash);
                     const updatesql = await GD.S_REQ_MYSQL_QUERY.request({
                         query:"UPDATE pay_services SET alias = \"@alias\" WHERE id=\"@id\"",
                         fields:{alias:alias,id:i.id}
@@ -255,9 +335,36 @@ class Solutions extends BaseHandler{
     }
 
     async get(packet: ExecutionParamsVO): Promise<TransferPacketVO<any>> {
+        let solution_id = -1;
+        if(packet.data && typeof packet.data === "object" && (packet.data as SimpleObjectVO).solution_id ){
+            solution_id = parseInt((packet.data as SimpleObjectVO).solution_id as any);
+        }
 
-        return await GD.S_SOLUTIONS_REQUEST.request();
+        const sols = await GD.S_SOLUTIONS_REQUEST.request();
+        if(sols.error || solution_id<1){
+            return sols;
+        }
 
+        if(!sols.data){
+            return {
+                error:Errors.SOLUTIONS_WRONG_SOLUTION_OBJECT,
+                data:null
+            }
+        }
+
+        for(let i of sols.data){
+            if(i.id === solution_id){
+                return {
+                    error:null,
+                    data:i
+                }
+            }
+        }
+        
+        return {
+            error:Errors.SOLUTIONS_CANT_FIND_SPECIFIC_SOLUTION,
+            data:{solution_id:solution_id}
+        }
     }
 
     createSolutionVO(packet:ExecutionParamsVO):SolutionVO{

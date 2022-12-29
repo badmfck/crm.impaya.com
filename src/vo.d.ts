@@ -32,6 +32,7 @@ declare interface TransferPacketVO<T>{
     responseTime?:number
     encrypted?:boolean
     version?:string
+    method?:string
 }
 
 declare interface ExecutionParamsVO{
@@ -171,9 +172,11 @@ declare interface PayServiceVO{
 declare interface SolutionVO{
     [key:string]
     id:number
+    ctime?:any
+    utme?:any
 	common:{
         name:string,
-        type:number
+        type_id:number
     },
     contacts:{
         id:number,
